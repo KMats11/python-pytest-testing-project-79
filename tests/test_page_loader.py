@@ -1,9 +1,16 @@
+import logging
 import os
 import tempfile
+
 import pytest
+import requests
 import requests_mock
+
 from page_loader.page_loader import make_filename, download
 
+# Настройка логирования для читаемого вывода
+logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
+logger = logging.getLogger(__name__)
 
 @pytest.fixture
 def temp_dir():
@@ -14,9 +21,42 @@ def temp_dir():
 
 def test_make_filename():
     """Тестирование создания имени файла из URL"""
-    assert make_filename("https://ru.hexlet.io/courses") == "ru-hexlet-io-courses.html"
-    assert make_filename("http://example.com/path/page") == "example-com-path-page.html"
-    assert make_filename("https://test.com/some-page?query=1") == "test-com-some-page-query-1.html"
+    urls = [
+        ("https://ru.hexlet.io/courses", "ru-hexlet-io-courses.html"),
+        ("http://example.com/path/page", "example-com-path-page.html"),
+        ("https://test.com/some-page?query=1", "test-com-some-page-query-1.html"),
+    ]
+
+    for url, expected in urls:
+        assert make_filename(url) == expected
+
+
+@pytest.mark.parametrize("status_code", [404, 500])
+def test_response_errors(temp_dir, status_code):
+    """Тестирование обработки ошибок 404 и 500"""
+    url = f"https://site.com/error-{status_code}"
+
+    with requests_mock.Mocker() as m:
+        m.get(url, status_code=status_code)
+        logger.info("Requested URL: %s (Expected error %s)", url, status_code)
+
+        with pytest.raises(requests.exceptions.HTTPError):
+            download(url, temp_dir)
+
+
+@pytest.mark.parametrize("invalid_path, expected_exception", [
+    ("C:\\this\\path\\does\\not\\exist", FileNotFoundError),
+    ("C:\\Windows\\System32\\config", PermissionError),
+])
+def test_storage_errors(invalid_path, expected_exception):
+    """Тестирование ошибок при сохранении"""
+    url = "https://site.com/blog/about"
+
+    with requests_mock.Mocker() as m:
+        m.get(url, text="<html></html>")
+
+        with pytest.raises(expected_exception):
+            download(url, invalid_path)
 
 
 def test_download(temp_dir):
@@ -28,16 +68,17 @@ def test_download(temp_dir):
     with requests_mock.Mocker() as m:
         m.get(url, text=test_page_text)  # Подмена запроса
 
+        logger.info("Downloading: %s", url)
         file_path = download(url, temp_dir)
+        logger.info("Saved to: %s", file_path)
 
-        # Проверка, что файл создан
+        # Проверка, что файл создан и корректен
         assert os.path.exists(file_path)
         assert file_path == expected_filename
 
-        # Проверка содержимое файла
+        # Проверка содержимого файла
         with open(file_path, encoding="utf-8") as file:
-            content = file.read()
-            assert content == test_page_text
+            assert file.read() == test_page_text
 
         # Проверка, что requests.get(url) был вызван ОДИН раз
         assert len(m.request_history) == 1
