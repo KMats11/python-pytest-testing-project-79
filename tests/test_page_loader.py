@@ -4,6 +4,7 @@ import pytest
 import requests_mock
 from page_loader.page_loader import make_filename, download
 
+
 @pytest.fixture
 def temp_dir():
     """Фикстура для создания временной директории"""

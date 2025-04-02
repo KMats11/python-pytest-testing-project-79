@@ -2,11 +2,13 @@ import os
 import re
 import requests
 
+
 def make_filename(url):
     """Формирует имя файла на основе URL"""
     url = url.split("//")[-1]  # Удаление 'http://' или 'https://'
     name = re.sub(r'\W+', '-', url).strip('-')  # Замена недопустимых символов и удаление лишних '-'
     return f"{name}.html"
+
 
 def download(url, output_dir=os.getcwd()):
     """Скачивает страницу по URL и сохраняет в файл"""
