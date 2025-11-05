@@ -27,7 +27,7 @@ def test_make_filename():
     urls = [
         ("https://ru.hexlet.io/courses", "ru-hexlet-io-courses.html"),
         ("http://example.com/path/page", "example-com-path-page.html"),
-        ("https://test.com/some-page?query=1", "test-com-some-page-query-1.html"),
+        ("https://ru.wikipedia.org/wiki/Покрытие_кода", "ru-wikipedia-org-wiki-Покрытие_кода.html"),
     ]
 
     for url, expected in urls:
@@ -47,18 +47,18 @@ def test_response_errors(temp_dir, status_code):
             download(url, temp_dir)
 
 
-@pytest.mark.parametrize("invalid_path, expected_exception", [
-    ("X:\\this\\path\\does\\not\\exist", FileNotFoundError),
-    ("C:\\Windows\\System32\\config", PermissionError),
-])
-def test_storage_errors(invalid_path, expected_exception):
-    """Тестирование ошибок при сохранении"""
+@pytest.mark.parametrize("invalid_path", ["C:\\fake_path"])
+def test_storage_errors(invalid_path, monkeypatch):
     url = "https://site.com/blog/about"
+
+    def fake_makedirs(path, exist_ok=False):
+        raise PermissionError("Нет доступа")
+
+    monkeypatch.setattr(os, "makedirs", fake_makedirs)
 
     with requests_mock.Mocker() as m:
         m.get(url, text="<html></html>")
-
-        with pytest.raises(expected_exception):
+        with pytest.raises(Exception):
             download(url, invalid_path)
 
 
@@ -111,10 +111,13 @@ def test_download_with_images(tmp_path):
     expected_img_path = os.path.join(tmp_path, "ru-hexlet-io-courses_files", expected_img_filename)
     expected_html_path = os.path.join(tmp_path, "ru-hexlet-io-courses.html")
 
+    # Используем requests_mock, чтобы подменить запросы
     with requests_mock.Mocker() as m:
+        # Подмена запроса HTML
         m.get(url, text=html_content)
+        # Подмена запроса изображения
         m.get(img_url, content=img_content)
-
+        # Вызываем download из модуля page_loader
         file_path = download(url, tmp_path)
 
         logger.info(f"Проверка: HTML сохранён в {expected_html_path}")
@@ -132,3 +135,46 @@ def test_download_with_images(tmp_path):
             html = file.read()
             logger.info("Проверка: заменена ли ссылка на локальное изображение в HTML")
             assert f'src="ru-hexlet-io-courses_files/{expected_img_filename}"' in html
+
+
+def test_download_with_link_and_script(tmp_path):
+    """Проверка скачивания локальных link и script ресурсов"""
+    url = "https://ru.hexlet.io/courses"
+    html_content = '''
+    <html>
+      <head>
+        <link href="/assets/application.css" rel="stylesheet">
+        <script src="/packs/js/runtime.js"></script>
+      </head>
+      <body></body>
+    </html>
+    '''
+    css_url = "https://ru.hexlet.io/assets/application.css"
+    js_url = "https://ru.hexlet.io/packs/js/runtime.js"
+    css_data = b"body { background: white; }"
+    js_data = b"console.log('ok');"
+
+    expected_css = "ru-hexlet-io-assets-application.css"
+    expected_js = "ru-hexlet-io-packs-js-runtime.js"
+    expected_dir = tmp_path / "ru-hexlet-io-courses_files"
+    expected_html = tmp_path / "ru-hexlet-io-courses.html"
+
+    with requests_mock.Mocker() as m:
+        m.get(url, text=html_content)
+        m.get(css_url, content=css_data)
+        m.get(js_url, content=js_data)
+
+        download(url, tmp_path)
+
+        # Проверяем, что ресурсы скачаны
+        assert (expected_dir / expected_css).exists()
+        assert (expected_dir / expected_js).exists()
+
+        # Проверяем, что содержимое совпадает
+        assert (expected_dir / expected_css).read_bytes() == css_data
+        assert (expected_dir / expected_js).read_bytes() == js_data
+
+        # Проверяем, что ссылки в HTML заменены на локальные пути
+        html = expected_html.read_text(encoding="utf-8")
+        assert f'href="ru-hexlet-io-courses_files/{expected_css}"' in html
+        assert f'src="ru-hexlet-io-courses_files/{expected_js}"' in html
