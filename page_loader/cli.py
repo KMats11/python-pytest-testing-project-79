@@ -10,8 +10,12 @@ def main():
 
     args = parser.parse_args()
 
-    file_path = download(args.url, args.output)
-    print(file_path)
+    try:
+        file_path = download(args.url, args.output)
+        print(file_path)
+    except Exception as e:
+        print(f"Ошибка: {e}")
+        exit(1)
 
 
 if __name__ == "__main__":
