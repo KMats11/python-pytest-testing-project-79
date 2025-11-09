@@ -1,6 +1,8 @@
-import os
 import argparse
-from page_loader.page_loader import download
+import os
+import sys
+
+from page_loader.page_loader import download, logger
 
 
 def main():
@@ -12,10 +14,11 @@ def main():
 
     try:
         file_path = download(args.url, args.output)
+        logger.info(f"Страница успешно загружена в: {file_path}")
         print(file_path)
     except Exception as e:
-        print(f"Ошибка: {e}")
-        exit(1)
+        logger.error(f"Ошибка: {e}")
+        sys.exit(1)
 
 
 if __name__ == "__main__":

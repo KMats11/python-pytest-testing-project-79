@@ -8,7 +8,12 @@ packages = ["page_loader"]
 [project]
 name = "page_loader"
 version = "0.1.0"
-dependencies = ["requests"]
+dependencies = ["requests",
+                "beautifulsoup4"]
+
+[project.optional-dependencies]
+dev = ["pytest",
+       "requests-mock"]
 
 [project.scripts]
 page-loader = "page_loader.cli:main"

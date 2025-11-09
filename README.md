@@ -1,6 +1,9 @@
 ### Hexlet tests and linter status:
 [![Actions Status](https://github.com/KMats11/python-pytest-testing-project-79/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/KMats11/python-pytest-testing-project-79/actions)
 
+# Page Loader
+Утилита для скачивания веб-страниц вместе с локальными ресурсами (img, link, script).
+
 ## Установка
 
 Установите пакет локально в editable режиме:
@@ -42,3 +45,10 @@ ru-hexlet-io-courses_files/
 
 По умолчанию выводятся сообщения `INFO` и выше.  
 Для подробного `DEBUG`-вывода можно изменить уровень логирования через переменные окружения или в настройках pytest.
+
+
+## Демонстрация работы
+
+Ниже показан пример работы утилиты, включая успешную загрузку и обработку ошибки:
+
+![Демонстрация работы Page Loader](page_loader_demo.gif)

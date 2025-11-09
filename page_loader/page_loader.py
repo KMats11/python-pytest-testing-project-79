@@ -1,13 +1,14 @@
 import logging
 import os
 import re
+import sys
 from urllib.parse import urlparse, urljoin
 
 import requests
 from bs4 import BeautifulSoup
 
 # Настройка логирования для читаемого вывода
-logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s", stream=sys.stderr)
 logger = logging.getLogger(__name__)
 
 
@@ -33,14 +34,20 @@ def make_filename(url, extension=None):
 def download_resource(resource_url, save_path):
     """Скачивает и сохраняет ресурс"""
     logger.debug(f"Попытка загрузить ресурс: {resource_url}")
-    response = requests.get(resource_url)
+    try:
+        response = requests.get(resource_url)
+        response.raise_for_status()
+    except requests.RequestException as e:
+        logger.error(f"Ошибка сети при загрузке ресурса {resource_url}: {e}")
+        raise
 
-    response.raise_for_status()
-
-    os.makedirs(os.path.dirname(save_path), exist_ok=True)
-
-    with open(save_path, 'wb') as f:
-        f.write(response.content)
+    try:
+        os.makedirs(os.path.dirname(save_path), exist_ok=True)
+        with open(save_path, 'wb') as f:
+            f.write(response.content)
+    except OSError as e:
+        logger.error(f"Ошибка при сохранении ресурса {save_path}: {e}")
+        raise
     logger.info(f"Ресурс успешно сохранён: {save_path}")
 
 
