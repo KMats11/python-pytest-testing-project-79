@@ -67,7 +67,7 @@ def test_storage_errors(invalid_path, monkeypatch):
 
     with requests_mock.Mocker() as m:
         m.get(url, text="<html></html>")
-        with pytest.raises(Exception):
+        with pytest.raises(PermissionError):
             download(url, invalid_path)
         logger.debug("PermissionError корректно вызвал исключение")
 
