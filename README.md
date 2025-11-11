@@ -1,6 +1,10 @@
 ### Hexlet tests and linter status:
 [![Actions Status](https://github.com/KMats11/python-pytest-testing-project-79/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/KMats11/python-pytest-testing-project-79/actions)
 
+[![Maintainability](https://qlty.sh/gh/KMats11/projects/python-pytest-testing-project-79/maintainability.svg)](https://qlty.sh/gh/KMats11/projects/python-pytest-testing-project-79)
+[![Code Coverage](https://qlty.sh/gh/KMats11/projects/python-pytest-testing-project-79/coverage.svg)](https://qlty.sh/gh/KMats11/projects/python-pytest-testing-project-79)
+
+
 # Page Loader
 Утилита для скачивания веб-страниц вместе с локальными ресурсами (img, link, script).
 
