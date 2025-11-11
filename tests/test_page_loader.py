@@ -54,7 +54,7 @@ def test_response_errors(temp_dir, status_code):
             logger.debug("Ошибка %s корректно вызвала исключение", status_code)
 
 
-@pytest.mark.parametrize("invalid_path", ["C:\\fake_path"])
+@pytest.mark.parametrize("invalid_path", ["/forbidden_path"])
 def test_storage_errors(invalid_path, monkeypatch):
     """Тестирование ошибки при недоступной директории"""
     url = "https://site.com/blog/about"
