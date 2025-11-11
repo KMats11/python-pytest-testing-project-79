@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 packages = ["page_loader"]
 
 [project]
-name = "page_loader"
+name = "hexlet-code"
 version = "0.1.0"
 dependencies = ["requests",
                 "beautifulsoup4"]
