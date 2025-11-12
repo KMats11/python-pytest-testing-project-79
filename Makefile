@@ -20,8 +20,8 @@ lint:
 
 # Запуск тестов
 test:
-	uv pip install pytest requests_mock
-	pytest
+	uv pip install pytest requests_mock pytest-cov
+	uv run pytest --cov=page_loader --cov-report=xml --cov-report=term
 
 # Запуск с тестовым URL
 run:
