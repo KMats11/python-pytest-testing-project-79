@@ -3,6 +3,7 @@
 # Установка зависимостей
 install:
 	uv pip install -r requirements.txt
+	uv pip install -e ".[dev]"
 
 # Сборка пакета
 build:
@@ -20,7 +21,6 @@ lint:
 
 # Запуск тестов
 test:
-	uv pip install pytest requests_mock pytest-cov
 	uv run pytest --cov=page_loader --cov-report=xml --cov-report=term
 
 # Запуск с тестовым URL
