@@ -3,7 +3,7 @@
 # Установка зависимостей
 install:
 	uv pip install -r requirements.txt
-	uv pip install -e ".[dev]"
+	uv pip install pytest-cov
 
 # Сборка пакета
 build:
