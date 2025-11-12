@@ -8,12 +8,14 @@ import requests
 from bs4 import BeautifulSoup
 
 # Настройка логирования для читаемого вывода
-logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s", stream=sys.stderr)
+logging.basicConfig(level=logging.INFO,
+                    format="%(levelname)s: %(message)s",
+                    stream=sys.stderr)
 logger = logging.getLogger(__name__)
 
 
 def make_filename(url, extension=None):
-    """Генерирует безопасное имя файла на основе URL и расширения (если указано)"""
+    """Генерирует безопасное имя файла на основе URL и расширения"""
     parsed = urlparse(url)
     path = parsed.netloc + parsed.path
     # Отделяем расширение заранее
@@ -81,7 +83,8 @@ def download(url, output_dir=os.getcwd()):
         os.makedirs(resource_dir)
         logger.debug(f"Создана директория для ресурсов: {resource_dir}")
     except OSError as e:
-        raise Exception(f"Ошибка при создании директории {resource_dir}: {e}") from e
+        raise Exception(
+            f"Ошибка при создании директории {resource_dir}: {e}") from e
 
     tags = soup.find_all(['img', 'link', 'script'])
     logger.debug(f"Найдено {len(tags)} тегов с потенциальными ресурсами")
@@ -115,7 +118,8 @@ def download(url, output_dir=os.getcwd()):
             f.write(soup.prettify())
         logger.info(f"HTML успешно сохранён: {html_path}")
     except OSError as e:
-        raise Exception(f"Ошибка при сохранении HTML-файла {html_path}: {e}") from e
+        raise Exception(
+            f"Ошибка при сохранении HTML-файла {html_path}: {e}") from e
 
     logger.info(f"Загрузка страницы завершена: {url}")
     return html_path

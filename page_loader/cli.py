@@ -6,9 +6,11 @@ from page_loader.page_loader import download, logger
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Page Loader: скачивает веб-страницу")
+    parser = argparse.ArgumentParser(
+        description="Page Loader: скачивает веб-страницу")
     parser.add_argument("url", help="URL страницы для загрузки")
-    parser.add_argument("-o", "--output", help="Директория для сохранения", default=os.getcwd())
+    parser.add_argument("-o", "--output", help="Директория для сохранения",
+                        default=os.getcwd())
 
     args = parser.parse_args()
 

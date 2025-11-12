@@ -11,10 +11,13 @@ import requests_mock
 from bs4 import BeautifulSoup
 
 from page_loader import cli
-from page_loader.page_loader import download_resource, is_local_resource, make_filename, download
+from page_loader.page_loader import (download_resource, is_local_resource,
+                                     make_filename, download)
 
 # Настройка логирования для читаемого вывода
-logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s", stream=sys.stderr)
+logging.basicConfig(level=logging.DEBUG,
+                    format="%(levelname)s: %(message)s",
+                    stream=sys.stderr)
 logger = logging.getLogger(__name__)
 
 
@@ -30,7 +33,8 @@ def test_make_filename():
     urls = [
         ("https://ru.hexlet.io/courses", "ru-hexlet-io-courses.html"),
         ("http://example.com/path/page", "example-com-path-page.html"),
-        ("https://ru.wikipedia.org/wiki/Покрытие_кода", "ru-wikipedia-org-wiki-Покрытие_кода.html"),
+        ("https://ru.wikipedia.org/wiki/Покрытие_кода",
+         "ru-wikipedia-org-wiki-Покрытие_кода.html"),
     ]
 
     logger.info("Проверяем генерацию имён файлов из URL")
@@ -47,11 +51,13 @@ def test_response_errors(temp_dir, status_code):
 
     with requests_mock.Mocker() as m:
         m.get(url, status_code=status_code)
-        logger.info("Проверяем обработку ошибки HTTP %s для %s", status_code, url)
+        logger.info("Проверяем обработку ошибки HTTP %s для %s",
+                    status_code, url)
 
         with pytest.raises(requests.exceptions.HTTPError):
             download(url, temp_dir)
-            logger.debug("Ошибка %s корректно вызвала исключение", status_code)
+            logger.debug("Ошибка %s корректно вызвала исключение",
+                         status_code)
 
 
 def test_storage_errors(monkeypatch, tmp_path):
@@ -75,15 +81,20 @@ def test_resource_dir_creation_error(monkeypatch, tmp_path):
 
     with requests_mock.Mocker() as m:
         m.get(url, text=html)
-        logger.info("Проверяем исключение при создании директории для ресурсов")
+        logger.info(
+            "Проверяем исключение при создании директории для ресурсов")
 
         # Подменяем os.makedirs, чтобы вызвать ошибку
-        monkeypatch.setattr(os, "makedirs", lambda *a, **kw: (_ for _ in ()).throw(OSError("Нет доступа")))
+        monkeypatch.setattr(
+            os,
+            "makedirs",
+            lambda *a, **kw: (_ for _ in ()).throw(OSError("Нет доступа")))
 
         with pytest.raises(Exception, match="Ошибка при создании директории"):
             download(url, tmp_path)
 
-        logger.debug("Исключение корректно выброшено при ошибке создания папки ресурсов")
+        logger.debug(
+            "Исключение корректно выброшено: ошибка создания папки ресурсов")
 
 
 def test_download(temp_dir):
@@ -91,7 +102,8 @@ def test_download(temp_dir):
     url = "https://ru.hexlet.io/courses"
     test_page_text = "<html><body>Test Page</body></html>"
     expected_filename = os.path.join(temp_dir, "ru-hexlet-io-courses.html")
-    expected_html = BeautifulSoup(test_page_text, "html.parser").prettify()
+    expected_html = BeautifulSoup(
+        test_page_text, "html.parser").prettify()
 
     with requests_mock.Mocker() as m:
         m.get(url, text=test_page_text)  # Подмена запроса
@@ -133,7 +145,8 @@ def test_download_with_images(tmp_path):
     img_content = real_image_path.read_bytes()
 
     expected_img_filename = "ru-hexlet-io-assets-professions-python.png"
-    expected_img_path = os.path.join(tmp_path, "ru-hexlet-io-courses_files", expected_img_filename)
+    expected_img_path = os.path.join(tmp_path, "ru-hexlet-io-courses_files",
+                                     expected_img_filename)
     expected_html_path = os.path.join(tmp_path, "ru-hexlet-io-courses.html")
 
     # Используем requests_mock, чтобы подменить запросы
@@ -160,7 +173,9 @@ def test_download_with_images(tmp_path):
         with open(expected_html_path, encoding="utf-8") as file:
             html = file.read()
             logger.debug("Проверяем замену src внутри HTML")
-            assert f'src="ru-hexlet-io-courses_files/{expected_img_filename}"' in html
+            assert (
+                    f'src="ru-hexlet-io-courses_files/{expected_img_filename}"'
+                    in html)
             logger.info("Тест скачивания изображения успешно пройден")
 
 
@@ -234,8 +249,10 @@ def test_download_resource_permission_error(monkeypatch, tmp_path):
     with requests_mock.Mocker() as m:
         m.get(url, content=b"fake data")
 
-        monkeypatch.setattr("builtins.open",
-                            lambda *a, **kw: (_ for _ in ()).throw(PermissionError("Нет доступа")))
+        monkeypatch.setattr(
+            "builtins.open",
+            lambda *a, **kw: (_ for _ in ()).throw(
+                PermissionError("Нет доступа")))
 
         # Проверяем, что PermissionError выбрасывается
         with pytest.raises(PermissionError):
@@ -250,7 +267,8 @@ def test_download_resource_http_error(monkeypatch, tmp_path):
     html = '<html><body><img src="/broken.png"></body></html>'
     broken_url = "https://hexlet.io/broken.png"
 
-    logger.info("Проверяем обработку HTTP-ошибки при загрузке ресурса %s", broken_url)
+    logger.info("Проверяем обработку HTTP-ошибки при загрузке ресурса %s",
+                broken_url)
     with requests_mock.Mocker() as m:
         m.get(url, text=html)
         m.get(broken_url, status_code=404)
@@ -272,7 +290,8 @@ def test_download_html_save_error(monkeypatch, tmp_path):
     url = "https://example.com"
     html = "<html></html>"
 
-    logger.info("Проверяем поведение при ошибке сохранения HTML-файла для %s", url)
+    logger.info("Проверяем поведение при ошибке сохранения HTML-файла для %s",
+                url)
     with requests_mock.Mocker() as m:
         m.get(url, text=html)
 
@@ -281,7 +300,8 @@ def test_download_html_save_error(monkeypatch, tmp_path):
 
         monkeypatch.setattr("builtins.open", fake_open)
 
-        with pytest.raises(Exception, match="Ошибка при сохранении HTML-файла"):
+        with pytest.raises(Exception,
+                           match="Ошибка при сохранении HTML-файла"):
             download(url, tmp_path)
     logger.info("Тест ошибки сохранения HTML успешно пройден")
 
@@ -291,7 +311,8 @@ def test_skip_external_resources(tmp_path):
     url = "https://ru.hexlet.io/courses"
     html = '<html><body><img src="https://external.com/img.png"></body></html>'
 
-    logger.info("Проверяем, что внешние ресурсы не скачиваются при загрузке %s", url)
+    logger.info(
+        "Проверяем, что внешние ресурсы не скачиваются при загрузке %s", url)
     with requests_mock.Mocker() as m:
         m.get(url, text=html)
         path = download(url, tmp_path)
@@ -322,7 +343,8 @@ def test_cli_exit_code(monkeypatch):
     """Тестирование CLI завершается с кодом 1 при ошибке"""
     logger.info("Проверяем CLI — завершение с кодом 1 при ошибке загрузки")
 
-    result = subprocess.run(["python", "-m", "page_loader.cli", "https://nonexistent.site/page"],
+    result = subprocess.run(["python", "-m", "page_loader.cli",
+                             "https://nonexistent.site/page"],
                             capture_output=True,
                             text=True)
 
@@ -373,11 +395,14 @@ def test_cli_download_success(capsys, monkeypatch, tmp_path):
     url = "https://example.com"
     fake_file = tmp_path / "example-com.html"
 
-    logger.info("Проверяем успешную загрузку через CLI с URL: %s", url)
+    logger.info("Проверяем успешную загрузку через CLI с URL: %s",
+                url)
 
     # Подмена download() чтобы не трогать сеть
-    monkeypatch.setattr("page_loader.cli.download", lambda u, o: str(fake_file))
-    monkeypatch.setattr(sys, "argv", ["page-loader", url, "-o", str(tmp_path)])
+    monkeypatch.setattr(
+        "page_loader.cli.download", lambda u, o: str(fake_file))
+    monkeypatch.setattr(
+        sys, "argv", ["page-loader", url, "-o", str(tmp_path)])
 
     cli.main()
     captured = capsys.readouterr()
@@ -397,7 +422,8 @@ def test_is_local_resource():
     logger.debug("Локальные ресурсы корректно определены")
 
     assert not is_local_resource("https://google.com/img.png", base)
-    assert not is_local_resource("//cdn.hexlet.io/img.png", "https://example.com")
+    assert not is_local_resource("//cdn.hexlet.io/img.png",
+                                 "https://example.com")
     logger.debug("Внешние ресурсы корректно определены")
 
     logger.info("Тест функции is_local_resource успешно пройден")
