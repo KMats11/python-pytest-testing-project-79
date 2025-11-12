@@ -68,13 +68,17 @@ def download(url, output_dir=os.getcwd()):
         logger.error(f"Ошибка при запросе страницы {url}: {e}")
         raise
 
+    # Проверяем, что директория существует
+    if not os.path.exists(output_dir):
+        raise Exception(f"Ошибка: директория {output_dir} не существует")
+
     soup = BeautifulSoup(response.text, 'html.parser')
     base_name = make_filename(url, 'html').replace('.html', '')
     resource_dir = os.path.join(output_dir, f"{base_name}_files")
 
     # Создаём папку для ресурсов
     try:
-        os.makedirs(resource_dir, exist_ok=True)
+        os.makedirs(resource_dir)
         logger.debug(f"Создана директория для ресурсов: {resource_dir}")
     except OSError as e:
         raise Exception(f"Ошибка при создании директории {resource_dir}: {e}") from e
@@ -107,7 +111,6 @@ def download(url, output_dir=os.getcwd()):
     html_path = os.path.join(output_dir, f"{base_name}.html")
 
     try:
-        os.makedirs(output_dir, exist_ok=True)
         with open(html_path, 'w', encoding='utf-8') as f:
             f.write(soup.prettify())
         logger.info(f"HTML успешно сохранён: {html_path}")

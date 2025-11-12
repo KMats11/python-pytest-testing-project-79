@@ -58,17 +58,32 @@ def test_storage_errors(monkeypatch, tmp_path):
     """Тест: проверяем поведение при ошибке доступа к директории"""
     url = "https://site.com/blog/about"
 
-    def fake_makedirs(path, exist_ok=False):
-        raise PermissionError("Нет доступа")
-
-    monkeypatch.setattr(os, "makedirs", fake_makedirs)
+    monkeypatch.setattr(os.path, "exists", lambda path: False)
     logger.info("Проверяем поведение при PermissionError")
 
     with requests_mock.Mocker() as m:
         m.get(url, text="<html></html>")
-        with pytest.raises(Exception, match="Ошибка при создании директории"):
+        with pytest.raises(Exception, match="не существует"):
             download(url, tmp_path / "some_dir")
         logger.debug("PermissionError корректно вызвал исключение")
+
+
+def test_resource_dir_creation_error(monkeypatch, tmp_path):
+    """Тестирование ошибки при создании папки для ресурсов"""
+    url = "https://site.com/page"
+    html = "<html><body><img src='/img.png'></body></html>"
+
+    with requests_mock.Mocker() as m:
+        m.get(url, text=html)
+        logger.info("Проверяем исключение при создании директории для ресурсов")
+
+        # Подменяем os.makedirs, чтобы вызвать ошибку
+        monkeypatch.setattr(os, "makedirs", lambda *a, **kw: (_ for _ in ()).throw(OSError("Нет доступа")))
+
+        with pytest.raises(Exception, match="Ошибка при создании директории"):
+            download(url, tmp_path)
+
+        logger.debug("Исключение корректно выброшено при ошибке создания папки ресурсов")
 
 
 def test_download(temp_dir):
