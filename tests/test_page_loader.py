@@ -54,9 +54,8 @@ def test_response_errors(temp_dir, status_code):
             logger.debug("Ошибка %s корректно вызвала исключение", status_code)
 
 
-@pytest.mark.parametrize("invalid_path", ["/forbidden_path"])
-def test_storage_errors(invalid_path, monkeypatch):
-    """Тестирование ошибки при недоступной директории"""
+def test_storage_errors(monkeypatch, tmp_path):
+    """Тест: проверяем поведение при ошибке доступа к директории"""
     url = "https://site.com/blog/about"
 
     def fake_makedirs(path, exist_ok=False):
@@ -67,8 +66,8 @@ def test_storage_errors(invalid_path, monkeypatch):
 
     with requests_mock.Mocker() as m:
         m.get(url, text="<html></html>")
-        with pytest.raises(PermissionError):
-            download(url, invalid_path)
+        with pytest.raises(Exception, match="Ошибка при создании директории"):
+            download(url, tmp_path / "some_dir")
         logger.debug("PermissionError корректно вызвал исключение")
 
 

@@ -8,6 +8,9 @@ packages = ["page_loader"]
 [project]
 name = "hexlet-code"
 version = "0.1.0"
+description = "Page loader project for Hexlet"
+readme = "README.md"
+requires-python = ">=3.9"
 dependencies = ["requests",
                 "beautifulsoup4"]
 
