@@ -30,6 +30,4 @@ jobs:
         run: pytest --cov=. --cov-report json:coverage.json
 
       - name: Upload coverage to Code Climate
-        run: |
-          CC_TEST_REPORTER_ID=${{ secrets.CODECLIMATE_REPO_TOKEN }} \
-          codeclimate-test-reporter upload-coverage -i coverage.json
+        run: codeclimate-test-reporter --file coverage.json --token ${{ secrets.CODECLIMATE_REPO_TOKEN }}
