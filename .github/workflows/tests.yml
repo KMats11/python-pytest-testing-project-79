@@ -27,8 +27,8 @@ jobs:
         run: pytest --cov=page_loader --cov-report xml
 
       - name: Upload coverage to Code Climate
-        uses: codeclimate/codeclimate-action@v2
-        with:
-          coverageCommand: pytest --cov=page_loader --cov-report xml
+        uses: paambaati/codeclimate-action@v9.0.0
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CODECLIMATE_REPO_TOKEN }}
+        with:
+          coverageCommand: pytest --cov=page_loader --cov-report xml:coverage.xml
