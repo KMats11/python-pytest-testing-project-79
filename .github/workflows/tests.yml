@@ -28,7 +28,7 @@ jobs:
           pytest --cov=page_loader --cov-report=xml
 
       - name: Upload coverage to Code Climate
-        uses: paambaati/codeclimate-action@v3.2.0
+        uses: paambaati/codeclimate-action@v3
         with:
           coverageCommand: "pytest --cov=page_loader --cov-report=xml"
         env:
