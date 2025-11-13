@@ -38,4 +38,4 @@ jobs:
         with:
           token: ${{ secrets.CODECLIMATE_REPO_TOKEN }}
           files: coverage.xml
-          add-prefix: /home/runner/work/python-pytest-testing-project-79/python-pytest-testing-project-79/
+          strip-prefix: /home/runner/work/python-pytest-testing-project-79/python-pytest-testing-project-79/
