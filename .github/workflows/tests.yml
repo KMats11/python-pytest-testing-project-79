@@ -32,4 +32,4 @@ jobs:
         with:
           token: ${{ secrets.CODECLIMATE_REPO_TOKEN }}
           files: coverage.xml
-          strip-prefix: ${GITHUB_WORKSPACE}/
+          add-prefix: .
