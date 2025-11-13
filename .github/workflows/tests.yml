@@ -31,11 +31,10 @@ jobs:
         run: |
           echo "Checking coverage.xml location..."
           ls -l coverage.xml
-          cat coverage.xml | head -n 20
+          cat coverage.xml | head -n 40
 
       - name: Upload coverage to Qlty
         uses: qltysh/qlty-action/coverage@v2.2.0
         with:
           token: ${{ secrets.CODECLIMATE_REPO_TOKEN }}
           files: coverage.xml
-          add-prefix: .
