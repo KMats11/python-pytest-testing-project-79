@@ -23,15 +23,14 @@ jobs:
           pip install -r requirements.txt
           pip install pytest pytest-cov
 
+      - name: Run linter
+        run: |
+          pip install flake8
+          flake8 page_loader tests
+
       - name: Run tests with coverage
         run: |
           pytest --cov=. --cov-report=xml:coverage.xml --cov-report term
-          
-      - name: Check coverage.xml exists
-        run: |
-          echo "Checking coverage.xml location..."
-          ls -l coverage.xml
-          cat coverage.xml | head -n 40
 
       - name: Upload coverage to Qlty
         uses: qltysh/qlty-action/coverage@v2.2.0
