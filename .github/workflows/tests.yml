@@ -22,11 +22,14 @@ jobs:
           pip install -r requirements.txt
           pip install pytest pytest-cov codeclimate-test-reporter
 
+      - name: Before tests (Code Climate)
+        run: |
+          ./cc-test-reporter before-build || true
+
       - name: Run tests with coverage
-        run: pytest --cov=. --cov-report xml
+        run: pytest --cov=. --cov-report json:coverage.json
 
       - name: Upload coverage to Code Climate
         run: |
-          curl -s https://codeclimate.com/test_reports \
-            -F "json_file=@coverage.xml" \
-            -F "repo_token=${{ secrets.CODECLIMATE_REPO_TOKEN }}"
+          CC_TEST_REPORTER_ID=${{ secrets.CODECLIMATE_REPO_TOKEN }} \
+          codeclimate-test-reporter upload-coverage -i coverage.json
