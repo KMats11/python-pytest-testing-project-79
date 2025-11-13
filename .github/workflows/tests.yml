@@ -24,11 +24,11 @@ jobs:
           pip install pytest pytest-cov
 
       - name: Run tests with coverage
-        run: pytest --cov=page_loader --cov-report xml
+        run: |
+          pytest --cov=page_loader --cov-report=xml
 
-      - name: Upload coverage to Code Climate
-        uses: paambaati/codeclimate-action@v9.0.0
-        env:
-          CC_TEST_REPORTER_ID: ${{ secrets.CODECLIMATE_REPO_TOKEN }}
+      - name: Upload coverage to Qlty
+        uses: qltysh/qlty-action@v2
         with:
-          coverageCommand: pytest --cov=page_loader --cov-report xml:coverage.xml
+          coverageToken: ${{ secrets.CODECLIMATE_REPO_TOKEN }}
+          coverageFile: coverage.xml
