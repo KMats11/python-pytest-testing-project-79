@@ -38,3 +38,4 @@ jobs:
         with:
           token: ${{ secrets.CODECLIMATE_REPO_TOKEN }}
           files: coverage.xml
+          add-prefix: page_loader
