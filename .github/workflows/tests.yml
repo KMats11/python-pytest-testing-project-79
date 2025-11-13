@@ -25,7 +25,7 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          pytest --cov=page_loader --cov-report=xml:coverage.xml --cov-report term
+          pytest --cov=. --cov-report=xml:coverage.xml --cov-report term
           
       - name: Check coverage.xml exists
         run: |
@@ -38,4 +38,4 @@ jobs:
         with:
           token: ${{ secrets.CODECLIMATE_REPO_TOKEN }}
           files: coverage.xml
-          strip-prefix: /home/runner/work/python-pytest-testing-project-79/python-pytest-testing-project-79/page_loader/
+          strip-prefix: /home/runner/work/python-pytest-testing-project-79/python-pytest-testing-project-79/
