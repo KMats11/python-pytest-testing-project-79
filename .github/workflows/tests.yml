@@ -25,11 +25,11 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          pytest --cov=page_loader --cov-report=xml:coverage.xml
+          pytest --cov=page_loader --cov-report=xml:coverage.xml --cov-report term
 
       - name: Upload coverage to Qlty
         uses: qltysh/qlty-action/coverage@v2.2.0
         with:
           token: ${{ secrets.CODECLIMATE_REPO_TOKEN }}
           files: coverage.xml
-          add-prefix: .
+          strip-prefix: ${GITHUB_WORKSPACE}/
